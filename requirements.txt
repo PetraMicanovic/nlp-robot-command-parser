@@ -1,0 +1,16 @@
+torch
+transformers
+datasets
+sentencepiece
+
+numpy
+pandas
+scikit-learn
+
+tqdm
+pyyaml
+
+openai-whisper
+gtts
+
+evaluate

@@ -1,28 +1,40 @@
 {
   "model": {
     "name": "t5-small",
-    "max_input_length": 64,
-    "max_output_length": 64
+    "prefix": "translate command to actions: ",
+    "max_input_len": 64,
+    "max_target_len": 128,
+    "num_beams": 4
   },
   "training": {
     "seed" : 42,
-    "batch_size": 16,
+    "train_batch_size": 32,
+    "eval_batch_size": 64,
     "learning_rate": 1e-4,
-    "epochs": 5,
-    "weight_decay": 0.01
+    "num_epochs": 5,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    "output_dir": "checkpoints"
+  },
+    "asr": {
+    "whisper_model": "base",
+    "language": "en",
+    "tts_lang": "en",
+    "audio_path": "/tmp/command.mp3"
   },
   "data": {
-    "dataset": "scan",
-    "split": "simple",
-    "train_path": "data/raw/train.txt",
-    "test_path": "data/raw/test.txt"
+    "scan_split": "simple",
+    "scan_base_path": "data/scan",
+    "n_eval": 200,
+    "n_error_analysis": 500
   },
   "generation": {
     "max_length": 64,
     "num_beams": 4
   },
-  "paths": {
-    "output_dir": "outputs/",
-    "model_dir": "outputs/models/"
-  }
+  "valid_actions": [
+    "WALK", "RUN", "JUMP", "LOOK",
+    "TURN_LEFT", "TURN_RIGHT",
+    "TURN_OPPOSITE_LEFT", "TURN_OPPOSITE_RIGHT"
+  ]
 }

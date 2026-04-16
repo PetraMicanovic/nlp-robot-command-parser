@@ -21,9 +21,12 @@ The system maps natural language commands into executable action sequences, with
 ## Datasets
 
 - **SCAN** [Simplified versions of the CommAI Navigation tasks](https://github.com/brendenlake/SCAN)
+
 Synthetic dataset of command-actions pairs used for training and primary evaluation. Additionally translated into Serbian using rule-based mapping of commands.
 - **HuRIC** [Human Robot Interaction Corpus](https://github.com/crux82/huric)
+
 Real-world human-robot interaction dataset used for additional evaluation and generalization testing. For this project, a subset(~25-50 samples) is manually selected, analyzed and adapted.
+
 ---
 ## Requirements
 Install dependencies using:
@@ -32,6 +35,7 @@ pip install -r requirements.txt
 ```
 ---
 ## Structure 
+```bash
 .
 ├── data/
 │   ├── scan/
@@ -66,6 +70,7 @@ pip install -r requirements.txt
 ├── LICENSE
 ├── README.md
 └── requirements.txt
+```
 ---
 ## Notes
 - The system uses constrained decoding to ensure valid action sequences

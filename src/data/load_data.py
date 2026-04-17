@@ -4,8 +4,10 @@ Module for loading and parsing the SCAN dataset.
 This module provides:
     - loading raw SCAN files
     - parsing commands and actions
-    - returning train/test splits
+    - returning train/test splits (English or Serbian)
+    - loading the HuRIC validation set
 """
+import json
 
 def parse_line(line):
     """
@@ -55,9 +57,9 @@ def load_scan_file(path):
     
     return data
 
-def load_scan(split="simple", base_path = "data/SCAN"):
+def load_scan(split="simple", base_path = "data/scan", lang = "en"):
     """
-    Loads SCAN dataset for a given split.
+    Loads SCAN dataset for a given split and optionally translates it to Serbian.
 
     This function handles the internal directory structure of the SCAN dataset,
     where each split (e.g. simple, length, add_prim) is stored inside its own
@@ -68,11 +70,14 @@ def load_scan(split="simple", base_path = "data/SCAN"):
     split: str
         Type of dataset split
     base_path: str
-        Folder where SCAN dataset is located
+        Folder where SCAN .txt files are located
+    lang: str
+        Language of the returned dataset: "en"(default) or "sr"(Serbian)
+        When "sr", commands and action tokens are translated using translate_scan.translate_dataset().
 
     Returns:
-    train_data: list
-    test_data: list
+    train_data: list of dict
+    test_data: list of dict
     """    
     split_map = {
         "add_prim": "add_prim_split",
@@ -89,5 +94,11 @@ def load_scan(split="simple", base_path = "data/SCAN"):
     
     train_data = load_scan_file(train_path)
     test_data = load_scan_file(test_path)
+
+    if lang == "sr":
+        from src.data.translate_scan import translate_dataset
+
+        train_data = translate_dataset(train_data, lang = "sr")
+        test_data = translate_dataset(test_data, lang = "sr")
     
     return train_data, test_data

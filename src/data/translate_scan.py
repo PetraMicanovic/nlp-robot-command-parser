@@ -68,7 +68,7 @@ COMMAND_EN_TO_SR = {
 
 # Translation functions
 
-def translate_command(command: str, lang: str = "en") -> str:
+def translate_command(command, lang = "en"):
     """
     Translates a SCAN command string from English to Serbian (or returns
     it unchanged for lang="en").
@@ -100,7 +100,7 @@ def translate_command(command: str, lang: str = "en") -> str:
     return " ".join(translated)
 
 
-def translate_actions(actions: str, lang: str = "en") -> str:
+def translate_actions(actions, lang = "en"):
     """
     Translates a SCAN action sequence from English to Serbian
     action tokens (or returns it unchanged for lang="en").
@@ -129,7 +129,7 @@ def translate_actions(actions: str, lang: str = "en") -> str:
     return " ".join(translated)
 
 
-def translate_dataset(data: list, lang: str = "sr") -> list:
+def translate_dataset(data, lang = "sr"):
     """
     Translates an entire dataset split (commands and actions) to Serbian.
 
@@ -158,7 +158,7 @@ def translate_dataset(data: list, lang: str = "sr") -> list:
 
 # Constrained decoding helpers
 
-def get_valid_actions(lang: str = "en") -> list:
+def get_valid_actions(lang = "en"):
     """
     Returns the list of valid action tokens for the given language.
 
@@ -175,7 +175,7 @@ def get_valid_actions(lang: str = "en") -> list:
     return SCAN_ACTIONS_EN
 
 
-def build_bad_word_ids(tokenizer, valid_actions: list) -> list:
+def build_bad_word_ids(tokenizer, valid_actions):
     """
     Builds the list of forbidden token IDs for constrained decoding.
     All tokens that are NOT part of valid actions, whitespace, or EOS
@@ -208,7 +208,7 @@ def build_bad_word_ids(tokenizer, valid_actions: list) -> list:
 
 # Statistics
 
-def get_action_vocab(data: list) -> list:
+def get_action_vocab(data):
     """
     Extracts the unique action tokens from a dataset split.
 
@@ -226,7 +226,7 @@ def get_action_vocab(data: list) -> list:
     return sorted(vocab)
 
 
-def print_stats(train_data: list, test_data: list):
+def print_stats(train_data, test_data):
     """
     Prints basic statistics about the dataset splits.
 

@@ -24,7 +24,6 @@ data/processed/
 
 # Outputs
 outputs/
-models/
 checkpoints/
 
 # HuggingFace cache

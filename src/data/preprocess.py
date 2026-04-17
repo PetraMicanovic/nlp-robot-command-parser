@@ -10,7 +10,7 @@ This module provides:
 from transformers import T5Tokenizer
 from datasets import Dataset
 
-def to_hf_dataset(data: list) -> Dataset:
+def to_hf_dataset(data):
     """
     Converts a list of dicts to a HuggingFace Dataset.
 
@@ -29,7 +29,7 @@ def to_hf_dataset(data: list) -> Dataset:
 
     return Dataset.from_dict({"commands": commands, "actions": actions})
 
-def get_tokenizer(model_name: str) -> T5Tokenizer:
+def get_tokenizer(model_name):
     """
     Loads a T5 tokenizer.
 

@@ -103,13 +103,16 @@ def build_trainer(model, tokenizer, tokenized_dataset, training_cfg, device_fp16
     Returns:
     trainer: Seq2SeqTrainer
     """
+    total_steps   = (len(tokenized_dataset["train"]) // training_cfg["train_batch_size"]) * training_cfg["num_epochs"]
+    warmup_steps  = int(total_steps * training_cfg["warmup_ratio"])
+
     args = Seq2SeqTrainingArguments(
         output_dir=training_cfg["output_dir"],
         num_train_epochs=training_cfg["num_epochs"],
         per_device_train_batch_size=training_cfg["train_batch_size"],
         per_device_eval_batch_size=training_cfg["eval_batch_size"],
         learning_rate=training_cfg["learning_rate"],
-        warmup_ratio=training_cfg["warmup_ratio"],
+        warmup_steps= warmup_steps,
         weight_decay=training_cfg["weight_decay"],
         predict_with_generate=True,
         generation_max_length=128,

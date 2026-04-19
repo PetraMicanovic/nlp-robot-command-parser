@@ -136,7 +136,6 @@ def build_trainer(model, tokenizer, tokenized_dataset, training_cfg, device_fp16
         args=args,
         train_dataset=tokenized_dataset["train"],
         eval_dataset=tokenized_dataset["test"],
-        tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=build_compute_metrics(tokenizer),
     )

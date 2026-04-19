@@ -234,8 +234,11 @@ def print_stats(train_data, test_data):
     train_data: list of dict
     test_data: list of dict
     """
-    cmd_lens = [len(ex["commands"].split()) for ex in train_data]
-    act_lens = [len(ex["actions"].split())  for ex in train_data]
+    cmd_lens = []
+    act_lens = []
+    for ex in train_data:
+        cmd_lens.append(len(ex["commands"].split()))
+        act_lens.append(len(ex["actions"].split()))
     vocab    = get_action_vocab(train_data)
 
     print("Dataset statistics:")

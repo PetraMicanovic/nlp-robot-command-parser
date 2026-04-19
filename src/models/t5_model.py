@@ -93,8 +93,19 @@ def predict(command,
         generate_kwargs["bad_words_ids"] = bad_word_ids
 
     with torch.no_grad():
-        outputs = model.generate(input_ids, **generate_kwargs)
-
+        if bad_word_ids is not None:
+            outputs = model.generate(
+                input_ids,
+                max_new_tokens=max_target_len,
+                num_beams=num_beams,
+                bad_words_ids=bad_word_ids,
+            )
+        else:
+            outputs = model.generate(
+                input_ids,
+                max_new_tokens=max_target_len,
+                num_beams=num_beams,
+            )
     result = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
     return result

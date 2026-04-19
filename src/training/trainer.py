@@ -12,6 +12,7 @@ from transformers import (
     Seq2SeqTrainer,
     Seq2SeqTrainingArguments,
     DataCollatorForSeq2Seq,
+    EarlyStoppingCallback,
 )
 
 
@@ -29,6 +30,7 @@ def build_compute_metrics(tokenizer):
     Returns:
     compute_metrics: callable
     """
+
     def compute_metrics(eval_preds):
         preds, labels = eval_preds
 
@@ -103,8 +105,10 @@ def build_trainer(model, tokenizer, tokenized_dataset, training_cfg, device_fp16
     Returns:
     trainer: Seq2SeqTrainer
     """
-    total_steps   = (len(tokenized_dataset["train"]) // training_cfg["train_batch_size"]) * training_cfg["num_epochs"]
-    warmup_steps  = int(total_steps * training_cfg["warmup_ratio"])
+    total_steps = (
+        len(tokenized_dataset["train"]) // training_cfg["train_batch_size"]
+    ) * training_cfg["num_epochs"]
+    warmup_steps = int(total_steps * training_cfg["warmup_ratio"])
 
     args = Seq2SeqTrainingArguments(
         output_dir=training_cfg["output_dir"],
@@ -112,7 +116,7 @@ def build_trainer(model, tokenizer, tokenized_dataset, training_cfg, device_fp16
         per_device_train_batch_size=training_cfg["train_batch_size"],
         per_device_eval_batch_size=training_cfg["eval_batch_size"],
         learning_rate=training_cfg["learning_rate"],
-        warmup_steps= warmup_steps,
+        warmup_steps=warmup_steps,
         weight_decay=training_cfg["weight_decay"],
         predict_with_generate=True,
         generation_max_length=128,
@@ -125,11 +129,8 @@ def build_trainer(model, tokenizer, tokenized_dataset, training_cfg, device_fp16
         report_to="none",
     )
 
-    data_collator = DataCollatorForSeq2Seq(
-        tokenizer,
-        model=model,
-        pad_to_multiple_of=8
-    )
+    data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, pad_to_multiple_of=8)
+    patience = training_cfg.get("early_stopping_patience", 3)
 
     trainer = Seq2SeqTrainer(
         model=model,
@@ -138,6 +139,7 @@ def build_trainer(model, tokenizer, tokenized_dataset, training_cfg, device_fp16
         eval_dataset=tokenized_dataset["test"],
         data_collator=data_collator,
         compute_metrics=build_compute_metrics(tokenizer),
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=patience)],
     )
 
     return trainer

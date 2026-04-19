@@ -7,16 +7,17 @@
     "num_beams": 4
   },
   "training": {
-    "seed" : 42,
-    "num_epochs": 5,
+    "seed": 42,
+    "num_epochs": 20,
     "train_batch_size": 32,
     "eval_batch_size": 64,
     "learning_rate": 1e-4,
     "weight_decay": 0.01,
     "warmup_ratio": 0.05,
-    "output_dir": "checkpoints"
+    "output_dir": "checkpoints",
+    "early_stopping_patience": 3
   },
-    "asr": {
+  "asr": {
     "whisper_model": "base",
     "language": "en",
     "tts_lang": "en",

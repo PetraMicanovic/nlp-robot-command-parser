@@ -14,13 +14,15 @@ import csv
 def save_evaluation_results(results, split_name, output_dir="results"):
     """
     Save evaluation results (from evaluate_model) into a JSON file.
+    The file will be named as: evaluation_<split_name>.json
 
     Parameters:
-    - results (dict): Dictionary containing evaluation metrics
-    - split_name (str): Dataset split name (e.g., 'test', 'validation')
-    - output_dir (str): Directory where the JSON file will be stored
-
-    The file will be named as: evaluation_<split_name>.json
+    results: dict
+        Dictionary containing evaluation metrics
+    split_name: str
+        Dataset split name
+    output_dir: str
+        Directory where the JSON file will be stored
     """
 
     os.makedirs(output_dir, exist_ok=True)
@@ -40,15 +42,13 @@ def copy_results_to_drive(output_dir="results"):
     It mounts Google Drive and copies the entire results folder.
 
     Parameters:
-    - output_dir (str): Local directory containing results
-
-    Behavior:
-    - If running in Colab → copies results to Google Drive
-    - If not → prints a fallback message
+    output_dir: str
+        Local directory containing results
     """
 
     try:
         from google.colab import drive
+
         drive.mount("/content/drive")
 
         import shutil
@@ -65,4 +65,6 @@ def copy_results_to_drive(output_dir="results"):
         print(f"Results folder copied to Google Drive: {dest}")
 
     except ImportError:
-        print("Not running in Colab environment - results are saved locally in results/")
+        print(
+            "Not running in Colab environment - results are saved locally in results/"
+        )

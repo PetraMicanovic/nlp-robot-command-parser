@@ -7,7 +7,9 @@ This module provides:
     - returning train/test splits (English or Serbian)
     - loading the HuRIC validation set
 """
+
 import json
+
 
 def parse_line(line):
     """
@@ -23,10 +25,10 @@ def parse_line(line):
         Target action sequence
     """
     line = line.strip()
-    
+
     command = line.split("IN: ")[1].split(" OUT:")[0]
     actions = line.split("OUT: ")[1]
-    
+
     return command, actions
 
 
@@ -37,7 +39,7 @@ def load_scan_file(path):
     Parameters:
     path: str
         Path to SCAN file
-    
+
     Returns:
     data: list of dict
         Each element has:  {
@@ -46,18 +48,16 @@ def load_scan_file(path):
                             }
     """
     data = []
-    
+
     with open(path, "r") as f:
         for line in f:
             command, actions = parse_line(line)
-            data.append({
-                "commands": command,
-                "actions": actions
-            })
-    
+            data.append({"commands": command, "actions": actions})
+
     return data
 
-def load_scan(split="simple", base_path = "data/scan", lang = "en"):
+
+def load_scan(split="simple", base_path="data/scan", lang="en"):
     """
     Loads SCAN dataset for a given split and optionally translates it to Serbian.
 
@@ -65,7 +65,7 @@ def load_scan(split="simple", base_path = "data/scan", lang = "en"):
     where each split (e.g. simple, length, add_prim) is stored inside its own
     subfolder. It maps the user-provided split name to the correct folder,
     constructs file paths, and loads both training and test data.
-    
+
     Parameters:
     split: str
         Type of dataset split
@@ -78,27 +78,32 @@ def load_scan(split="simple", base_path = "data/scan", lang = "en"):
     Returns:
     train_data: list of dict
     test_data: list of dict
-    """    
-    split_map = {
-        "add_prim": "add_prim_split",
-        "few_shot": "few_shot_split",
-        "filler": "filler_split",
+    """
+    subfolder_map = {
+        "addprim_jump": "add_prim_split",
+        "addprim_turn_left": "add_prim_split",
+        "template_around_right": "template_split",
+        "few_shot_1": "few_shot_split",
+        "filler_num0": "filler_split",
         "length": "length_split",
-        "simple":"simple_split",
-        "template": "template_split"
+        "simple": "simple_split",
     }
 
-    split_folder = split_map.get(split, split)
-    train_path = f"{base_path}/{split_folder}/tasks_train_{split}.txt"
-    test_path = f"{base_path}/{split_folder}/tasks_test_{split}.txt"
-    
+    if split in subfolder_map:
+        subfolder = subfolder_map[split]
+    else:
+        subfolder = split
+
+    train_path = f"{base_path}/{subfolder}/tasks_train_{split}.txt"
+    test_path = f"{base_path}/{subfolder}/tasks_test_{split}.txt"
+
     train_data = load_scan_file(train_path)
     test_data = load_scan_file(test_path)
 
     if lang == "sr":
         from src.data.translate_scan import translate_dataset
 
-        train_data = translate_dataset(train_data, lang = "sr")
-        test_data = translate_dataset(test_data, lang = "sr")
-    
+        train_data = translate_dataset(train_data, lang="sr")
+        test_data = translate_dataset(test_data, lang="sr")
+
     return train_data, test_data

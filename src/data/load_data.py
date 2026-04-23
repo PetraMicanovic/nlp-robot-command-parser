@@ -79,14 +79,37 @@ def load_scan(split="simple", base_path="data/scan", lang="en"):
     train_data: list of dict
     test_data: list of dict
     """
+    
     subfolder_map = {
-        "addprim_jump": "add_prim_split",
-        "addprim_turn_left": "add_prim_split",
-        "template_around_right": "template_split",
-        "few_shot_1": "few_shot_split",
-        "filler_num0": "filler_split",
-        "length": "length_split",
-        "simple": "simple_split",
+        # simple
+        "simple":                        "simple_split",
+        # length
+        "length":                        "length_split",
+        # add_prim
+        "addprim_jump":                  "add_prim_split",
+        "addprim_turn_left":             "add_prim_split",
+        # template
+        "template_around_right":         "template_split",
+        "template_jump_around_right":    "template_split",
+        "template_opposite_right":       "template_split",
+        "template_right":                "template_split",
+        # filler
+        "filler_num0":                   "filler_split",
+        "filler_num1":                   "filler_split",
+        "filler_num2":                   "filler_split",
+        "filler_num3":                   "filler_split",
+        # few_shot (num x rep kombinacije, npr. fewshot_num1_rep1)
+        "fewshot_num1_rep1":             "few_shot_split",
+        "fewshot_num2_rep1":             "few_shot_split",
+        "fewshot_num4_rep1":             "few_shot_split",
+        "fewshot_num8_rep1":             "few_shot_split",
+        "fewshot_num16_rep1":            "few_shot_split",
+        "fewshot_num32_rep1":            "few_shot_split",
+        "fewshot_num64_rep1":            "few_shot_split",
+        "fewshot_num128_rep1":           "few_shot_split",
+        "fewshot_num256_rep1":           "few_shot_split",
+        "fewshot_num512_rep1":           "few_shot_split",
+        "fewshot_num1024_rep1":          "few_shot_split",
     }
 
     if split in subfolder_map:

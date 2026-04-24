@@ -9,13 +9,12 @@ This module provides:
 
 from collections import defaultdict
 from src.models.t5_model import predict
-from src.data.translate_scan import build_bad_word_ids, get_valid_actions
 
 
 def evaluate_model(test_data, model, tokenizer, cfg, device, n=200):
     """
     Evaluates the model on the first n examples of the test set.
-    Runs both constrained and unconstrained decoding for comparison.
+    Runs unconstrained decoding for comparison.
 
     Parameters:
     test_data: list of dict
@@ -33,29 +32,14 @@ def evaluate_model(test_data, model, tokenizer, cfg, device, n=200):
         Keys: constrained_exact_match, unconstrained_exact_match, n_evaluated
     """
     model_cfg = cfg["model"]
-    bad_word_ids = build_bad_word_ids(tokenizer, cfg["valid_actions"])
-
-    exact_c = 0
-    exact_uc = 0
+    exact = 0
 
     for i in range(n):
         ex = test_data[i]
         cmd = ex["commands"]
         gold = ex["actions"].strip()
 
-        pred_c = predict(
-            cmd,
-            model,
-            tokenizer,
-            prefix=model_cfg["prefix"],
-            max_input_len=model_cfg["max_input_len"],
-            max_target_len=model_cfg["max_target_len"],
-            device=device,
-            num_beams=model_cfg["num_beams"],
-            bad_word_ids=bad_word_ids,
-        ).strip()
-
-        pred_uc = predict(
+        pred = predict(
             cmd,
             model,
             tokenizer,
@@ -66,14 +50,11 @@ def evaluate_model(test_data, model, tokenizer, cfg, device, n=200):
             num_beams=model_cfg["num_beams"],
         ).strip()
 
-        if pred_c == gold:
-            exact_c += 1
-        if pred_uc == gold:
-            exact_uc += 1
+        if pred == gold:
+            exact += 1
 
     return {
-        "constrained_exact_match": round(exact_c / n, 4),
-        "unconstrained_exact_match": round(exact_uc / n, 4),
+        "exact_match": round(exact / n, 4),
         "n_evaluated": n,
     }
 
@@ -97,7 +78,6 @@ def analyse_by_length(test_data, model, tokenizer, cfg, device, n=500):
         Values are dicts with "correct" and "total" counts.
     """
     model_cfg = cfg["model"]
-    bad_word_ids = build_bad_word_ids(tokenizer, cfg["valid_actions"])
     buckets = defaultdict(lambda: {"correct": 0, "total": 0})
 
     for i in range(n):
@@ -116,7 +96,6 @@ def analyse_by_length(test_data, model, tokenizer, cfg, device, n=500):
             max_target_len=model_cfg["max_target_len"],
             device=device,
             num_beams=model_cfg["num_beams"],
-            bad_word_ids=bad_word_ids,
         ).strip()
 
         buckets[bucket]["total"] += 1
@@ -126,17 +105,15 @@ def analyse_by_length(test_data, model, tokenizer, cfg, device, n=500):
     return dict(buckets)
 
 
-def print_comparison(results):
+def print_exact_match(results):
     """
-    Prints constrained vs. unconstrained decoding comparison.
+    Prints exact match.
 
     Parameters:
     results: dict
         Output of evaluate_model()
     """
-    print("Constrained vs. unconstrained decoding:")
-    print(f"  Constrained   exact match : {results['constrained_exact_match']:.2%}")
-    print(f"  Unconstrained exact match : {results['unconstrained_exact_match']:.2%}")
+    print(f"  Еxact match : {results['exact_match']:.2%}")
     print(f"  (evaluated on {results['n_evaluated']} examples)")
 
 

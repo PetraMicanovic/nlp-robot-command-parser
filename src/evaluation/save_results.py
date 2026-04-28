@@ -34,6 +34,31 @@ def save_evaluation_results(results, split_name, output_dir="results"):
     print(f"Evaluation results saved to: {filepath}")
 
 
+def save_length_analysis(buckets, output_dir="results"):
+    """
+    Save length analysis results into a JSON file.
+
+    Parameters:
+    buckets: dict
+        Dictionary containing grouped analysis results.
+        Keys usually represent categories, ranges or sequence lengths, while values contain statistics or collected data for each group.
+    output_dir: str
+        Directory where the JSON file will be stored
+    """
+
+    os.makedirs(output_dir, exist_ok=True)
+    filepath = os.path.join(output_dir, f"length_analysis.json")
+
+    serializable = {}
+    for key in buckets:
+        serializable[str(key)] = buckets[key]
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(serializable, f, indent=2, ensure_ascii=False)
+
+    print(f"Length analysis saved to: {filepath}")
+
+
 def copy_results_to_drive(output_dir="results"):
     """
     Copy the local results directory to Google Drive.

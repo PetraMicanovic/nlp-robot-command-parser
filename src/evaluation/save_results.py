@@ -8,8 +8,6 @@ This module provides utility functions for:
 
 import os
 import json
-import csv
-
 
 def save_evaluation_results(results, split_name, output_dir="results"):
     """
@@ -74,7 +72,8 @@ def copy_results_to_drive(output_dir="results"):
     try:
         from google.colab import drive
 
-        drive.mount("/content/drive")
+        if not os.path.isdir("/content/drive/MyDrive"):
+            drive.mount("/content/drive")
 
         import shutil
 
@@ -93,3 +92,63 @@ def copy_results_to_drive(output_dir="results"):
         print(
             "Not running in Colab environment - results are saved locally in results/"
         )
+
+
+def save_asr_results(asr_results, output_dir="results", filename="asr_results.json"):
+    """
+    Save ASR pipeline results to a JSON file.
+
+    Parameters
+    asr_results : list[dict]
+        Output of ``run_asr_pipeline`` — each dict has keys: ``command``, ``audio_path``, ``transcript``, ``match``
+    output_dir : str
+        Directory where the file will be stored
+    filename : str
+        Output filename
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    filepath = os.path.join(output_dir, filename)
+
+    n_match = sum(r["match"] for r in asr_results)
+    summary = {
+        "n_commands": len(asr_results),
+        "n_exact_match": n_match,
+        "exact_match_rate": (
+            round(n_match / len(asr_results), 4) if asr_results else 0.0
+        ),
+        "results": asr_results,
+    }
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=2, ensure_ascii=False)
+
+    print(f"ASR results saved to: {filepath}")
+    return filepath
+
+
+def save_audio_to_drive(audio_path, filename=None):
+    """
+    Copy a single audio file to Google Drive (Colab only).
+
+    Parameters
+    audio_path : str
+        Local path to the .mp3 file.
+    filename : str, optional
+        Name to use on Google Drive.  Defaults to the basename of *audio_path*.
+    """
+    try:
+        from google.colab import drive
+        import shutil
+
+        if not os.path.isdir("/content/drive/MyDrive"):
+            drive.mount("/content/drive")
+        dest_dir = "/content/drive/MyDrive/nlp-robot-command-parser/audio"
+        os.makedirs(dest_dir, exist_ok=True)
+
+        dest_name = filename if filename else os.path.basename(audio_path)
+        dest_path = os.path.join(dest_dir, dest_name)
+        shutil.copy2(audio_path, dest_path)
+        print(f"Audio file copied to Google Drive: {dest_path}")
+
+    except ImportError:
+        print("Not running in Colab — audio file stays at:", audio_path)

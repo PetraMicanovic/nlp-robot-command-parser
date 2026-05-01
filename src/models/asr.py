@@ -9,8 +9,25 @@ This module provides:
 import whisper
 from gtts import gTTS
 import os
+import re
 
 asr_model = None
+# Diacritic characters -> ASCII equivalents for T5 compatibility
+_DIACRITIC_MAP = str.maketrans("čćšžČĆŠŽ", "ccszCCSZ")
+
+# Phonetic variants that Whisper frequently produces for Serbian
+_SCAN_ALIASES = {
+    "ljevo": "lijevo",
+    "desno": "desno",
+    "skoci": "skoci",
+    "hodai": "hodaj",
+    "trci": "trci",
+    "skociti": "skoci",
+    "hodati": "hodaj",
+    "trcati": "trci",
+    "gledati": "gledaj",
+    "okreni": "okreni",
+}
 
 
 def text_to_speech(text, filepath, language="sr"):
@@ -34,7 +51,32 @@ def text_to_speech(text, filepath, language="sr"):
     return filepath
 
 
-def transcribe(filepath, whisper_model_name="small", language="sr"):
+def normalize_transcript(text):
+    """
+    Normalizes ASR output for T5 compatibility:
+      1. Removes punctuation
+      2. Converts to lowercase
+      3. Strips diacritics (T5 tokenizes č,ć,š,đ,ž poorly)
+      4. Applies phonetic variant corrections
+
+    Parameters:
+    text: str
+        Raw Whisper transcript
+
+    Returns:
+    normalized: str
+        Cleaned text ready for T5
+    """
+    text = re.sub(r"[^\w\s]", "", text).lower().strip()
+    text = text.replace("đ", "dj").replace("Đ", "DJ")
+    text = text.translate(_DIACRITIC_MAP)
+    tokens = []
+    for t in text.split():
+        tokens.append(_SCAN_ALIASES.get(t, t))
+    return " ".join(tokens)
+
+
+def transcribe(filepath, whisper_model_name="small", language="sr", normalize=True):
     """
     Transcribes an audio file to text using Whisper.
     The model is loaded once and cached in the module-level ``asr_model`` variable so that repeated calls do not reload weights from disk.
@@ -46,6 +88,9 @@ def transcribe(filepath, whisper_model_name="small", language="sr"):
         Whisper model size
     language: str
         Language of the audio
+    normalize: bool
+        If True and language='sr', strips diacritics and applies phonetic corrections before returning.
+        Set to False to observe raw Whisper output and measure T5 degradation on unclean input.
 
     Returns:
     transcript: str
@@ -58,7 +103,11 @@ def transcribe(filepath, whisper_model_name="small", language="sr"):
         asr_model = whisper.load_model(whisper_model_name)
 
     result = asr_model.transcribe(filepath, language=language)
-    return result["text"].strip().lower()
+    raw = result["text"].strip().lower()
+
+    if language == "sr" and normalize:
+        return normalize_transcript(raw)
+    return raw
 
 
 def generate_audio_files(commands, audio_dir, language="sr", prefix="cmd"):
@@ -97,7 +146,9 @@ def generate_audio_files(commands, audio_dir, language="sr", prefix="cmd"):
     return audio_paths
 
 
-def transcribe_batch(audio_paths, whisper_model_name="small", language="sr"):
+def transcribe_batch(
+    audio_paths, whisper_model_name="small", language="sr", normalize=True
+):
     """
     Transcribes a list of audio files using Whisper.
 
@@ -110,6 +161,10 @@ def transcribe_batch(audio_paths, whisper_model_name="small", language="sr"):
         Whisper model size
     language : str
         Language hint for Whisper
+    normalize: bool
+        If True and language='sr', strips diacritics and applies phonetic corrections before returning.
+        Set to False to observe raw Whisper output and measure T5 degradation on unclean input.
+
 
     Returns
     transcripts : list[str]
@@ -126,7 +181,12 @@ def transcribe_batch(audio_paths, whisper_model_name="small", language="sr"):
 
     for idx, path in enumerate(audio_paths):
         result = asr_model.transcribe(path, language=language)
-        transcripts.append(result["text"].strip().lower())
+        raw = result["text"].strip().lower()
+        if language == "sr" and normalize:
+            transcript = normalize_transcript(raw)
+        else:
+            transcript = raw
+        transcripts.append(transcript)
 
         if (idx + 1) % 10 == 0 or (idx + 1) == n:
             print(f"  Transcribed {idx + 1}/{n} files ...")

@@ -34,7 +34,7 @@ def text_to_speech(text, filepath, language="sr"):
     return filepath
 
 
-def transcribe(filepath, whisper_model_name="base", language="sr"):
+def transcribe(filepath, whisper_model_name="small", language="sr"):
     """
     Transcribes an audio file to text using Whisper.
     The model is loaded once and cached in the module-level ``asr_model`` variable so that repeated calls do not reload weights from disk.
@@ -97,7 +97,7 @@ def generate_audio_files(commands, audio_dir, language="sr", prefix="cmd"):
     return audio_paths
 
 
-def transcribe_batch(audio_paths, whisper_model_name="base", language="sr"):
+def transcribe_batch(audio_paths, whisper_model_name="small", language="sr"):
     """
     Transcribes a list of audio files using Whisper.
 
@@ -137,7 +137,7 @@ def transcribe_batch(audio_paths, whisper_model_name="base", language="sr"):
 def run_asr_pipeline(
     commands,
     audio_dir="audio_commands",
-    whisper_model_name="base",
+    whisper_model_name="small",
     tts_language="sr",
     asr_language="sr",
     prefix="cmd",

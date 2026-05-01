@@ -19,9 +19,11 @@
   },
   "asr": {
     "whisper_model": "base",
-    "language": "en",
-    "tts_lang": "en",
-    "audio_path": "/tmp/command.mp3"
+    "language": "sr",
+    "tts_lang": "sr",
+    "audio_path": "/tmp/command.mp3",
+    "audio_dir": "audio_commands",
+    "n_asr_samples": 100
   },
   "data": {
     "scan_split": "simple",

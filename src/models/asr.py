@@ -21,6 +21,7 @@ _SCAN_ALIASES = {
     "desno": "desno",
     "skoci": "skoci",
     "hodai": "hodaj",
+    "hoda i": "hodaj",
     "trci": "trci",
     "skociti": "skoci",
     "hodati": "hodaj",

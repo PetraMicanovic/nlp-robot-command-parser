@@ -39,7 +39,7 @@ pip install -r requirements.txt
 .
 ├── data/
 │   ├── scan/
-│   └── huric/
+│   └── custom_validation_sr.json
 │
 ├── notebooks/
 │   └── main.ipynb
@@ -55,15 +55,14 @@ pip install -r requirements.txt
 │   │   └── asr.py
 │   │
 │   ├── training/
-│   │   ├── trainer.py
-│   │   └── pipeline.py
+│   │   └── trainer.py
 │   │
 │   └── evaluation/
-│       └── evaluation.py
-│
-├── outputs/
-│   ├── predictions/
-│   └── models/
+│   │   ├── evaluation.py
+│   │   └── save_results.py
+│   │
+│   └── pipeline.py
+├── results/
 │
 ├── .gitignore
 ├── config.json

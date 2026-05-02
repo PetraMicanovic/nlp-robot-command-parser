@@ -40,9 +40,14 @@ _SCAN_ALIASES = {
     "gledajte": "gledaj",
     "gleda": "gledaj",
     "gledaji": "gledaj",
+    "vledaj": "gledaj",
+    "bledaj": "gledaj",
     "okrenite": "okreni",
     "okrenuti": "okreni",
+    "mokreni": "okreni",
     "oko": "okolo",
+    "suprudno": "suprotno",
+    "suuprotno": "suprotno",
 }
 
 _BIGRAM_FIXES: dict = {
@@ -52,7 +57,10 @@ _BIGRAM_FIXES: dict = {
     ("3", "puta"): "tri puta",
     ("okreni", "se"): "okreni se",
     ("li", "jevo"): "lijevo",
+    ("ili", "jevo"): "lijevo",
+    ("i", "lijevo"): "lijevo",
     ("de", "sno"): "desno",
+    ("la", "desno"): "desno",
     ("hoda", "i"): "hodaj",
     ("hodaj", "i"): "hodaj i",
     ("hode", "i"): "hodaj",

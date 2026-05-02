@@ -13,24 +13,72 @@ import re
 
 asr_model = None
 # Diacritic characters -> ASCII equivalents for T5 compatibility
-_DIACRITIC_MAP = str.maketrans("čćšžČĆŠŽ", "ccszCCSZ")
+_DIACRITIC_MAP = str.maketrans("čćšžđČĆŠŽĐ", "ccszd" "CCSZD")
 
 # Phonetic variants that Whisper frequently produces for Serbian
 _SCAN_ALIASES = {
     "ljevo": "lijevo",
+    "lievo": "lijevo",
+    "levo": "lijevo",
     "desno": "desno",
     "skoci": "skoci",
     "hodai": "hodaj",
-    "hoda i": "hodaj",
-    "hoda  i": "hodaj",
-    "trci": "trci",
+    "hodati": "hodaj",
+    "hoda": "hodaj",
+    "trcati": "trci",
+    "trcite": "trci",
+    "trcimo": "trci",
     "skociti": "skoci",
     "hodati": "hodaj",
     "trcati": "trci",
     "gledati": "gledaj",
-    "okreni": "okreni",
+    "gledajte": "gledaj",
+    "okrenite": "okreni",
+    "okrenuti": "okreni",
 }
 
+_BIGRAM_FIXES: dict = {
+    ("dva", "puta"): "dva puta",
+    ("tri", "puta"): "tri puta",
+    ("okreni", "se"): "okreni se",
+}
+
+# Mapping: SCAN Serbian token -> natural Serbian with diacritics (for gTTS)
+_SCAN_TO_NATURAL = {
+    "skoci": "skoči",
+    "trci": "trči",
+    "gledaj": "gledaj",
+    "hodaj": "hodaj",
+    "lijevo": "lijevo",
+    "desno": "desno",
+    "okolo": "okolo",
+    "suprotno": "suprotno",
+    "dva puta": "dva puta",
+    "tri puta": "tri puta",
+    "okreni se": "okreni se",
+    "i": "i",
+    "nakon": "nakon",
+}
+
+
+def add_diacritics(command):
+    """
+    Converts a SCAN Serbian command to natural Serbian with diacritics.
+    Used before gTTS so that the audio sounds natural.
+
+    Parameters:
+    command: str
+        SCAN Serbian command without diacritics, e.g. "skoci lijevo dva puta"
+
+    Returns:
+    natural: str
+        Command with diacritics, e.g. "skoči lijevo dva puta"
+    """
+    tokens = command.strip().split()
+    result = []
+    for tok in tokens:
+        result.append(_SCAN_TO_NATURAL.get(tok, tok))
+    return " ".join(result)
 
 def text_to_speech(text, filepath, language="sr"):
     """
@@ -60,6 +108,8 @@ def normalize_transcript(text):
       2. Converts to lowercase
       3. Strips diacritics (T5 tokenizes č,ć,š,đ,ž poorly)
       4. Applies phonetic variant corrections
+      5. Stitch Whisper-split multi-word SCAN tokens ("dva puta", "tri puta",
+       "okreni se") with a greedy left-to-right bigram pass.
 
     Parameters:
     text: str
@@ -75,7 +125,18 @@ def normalize_transcript(text):
     tokens = []
     for t in text.split():
         tokens.append(_SCAN_ALIASES.get(t, t))
-    return " ".join(tokens)
+
+    stitched: list = []
+    i = 0
+    while i < len(tokens):
+        if i + 1 < len(tokens) and (tokens[i], tokens[i + 1]) in _BIGRAM_FIXES:
+            stitched.append(_BIGRAM_FIXES[(tokens[i], tokens[i + 1])])
+            i += 2
+        else:
+            stitched.append(tokens[i])
+            i += 1
+
+    return " ".join(stitched)
 
 
 def transcribe(filepath, whisper_model_name="small", language="sr", normalize=True):
@@ -138,7 +199,8 @@ def generate_audio_files(commands, audio_dir, language="sr", prefix="cmd"):
     for idx, cmd in enumerate(commands):
         filename = f"{prefix}_{idx:04d}.mp3"
         filepath = os.path.join(audio_dir, filename)
-        text_to_speech(cmd, filepath, language=language)
+        natural_cmd = add_diacritics(cmd)
+        text_to_speech(natural_cmd, filepath, language=language)
         audio_paths.append(filepath)
 
         if (idx + 1) % 10 == 0 or (idx + 1) == len(commands):
@@ -241,19 +303,19 @@ def run_asr_pipeline(
     print(f"  Audio folder   : {audio_dir}")
     print(f"{'='*55}\n")
 
-    # Step 1 -- TTS
-    print("Step 1 / 2 -- Generating audio files with gTTS ...")
+    # 1. TTS
+    print("1. Generating audio files with gTTS ...")
     audio_paths = generate_audio_files(
         commands, audio_dir, language=tts_language, prefix=prefix
     )
 
-    # Step 2 -- ASR
-    print("\nStep 2 / 2 -- Transcribing with Whisper ...")
+    # 2. ASR
+    print("\n2. Transcribing with Whisper ...")
     transcripts = transcribe_batch(
         audio_paths, whisper_model_name=whisper_model_name, language=asr_language
     )
 
-    # Step 3 -- Assemble results
+    # 3. Assemble results
     results = []
     for cmd, path, tr in zip(commands, audio_paths, transcripts):
         results.append(

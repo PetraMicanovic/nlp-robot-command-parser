@@ -18,6 +18,7 @@ _DIACRITIC_MAP = str.maketrans("čćšžđČĆŠŽĐ", "ccszd" "CCSZD")
 # Phonetic variants that Whisper frequently produces for Serbian
 _SCAN_ALIASES = {
     "ljevo": "lijevo",
+    "ljivo": "lijevo",
     "lievo": "lijevo",
     "levo": "lijevo",
     "desno": "desno",
@@ -25,14 +26,22 @@ _SCAN_ALIASES = {
     "hodai": "hodaj",
     "hodati": "hodaj",
     "hoda": "hodaj",
+    "hodej": "hodaj",
+    "hodei": "hodaj",
+    "hode": "hodaj",
     "trcati": "trci",
     "trcite": "trci",
     "trcimo": "trci",
+    "trdji": "trci",
+    "drci": "trci",
     "skociti": "skoci",
+    "skolci": "skoci",
     "hodati": "hodaj",
     "trcati": "trci",
     "gledati": "gledaj",
     "gledajte": "gledaj",
+    "gleda": "gledaj",
+    "gledaji": "gledaj",
     "okrenite": "okreni",
     "okrenuti": "okreni",
 }
@@ -40,10 +49,16 @@ _SCAN_ALIASES = {
 _BIGRAM_FIXES: dict = {
     ("dva", "puta"): "dva puta",
     ("tri", "puta"): "tri puta",
+    ("2", "puta"): "dva puta",
+    ("3", "puta"): "tri puta",
     ("okreni", "se"): "okreni se",
     ("li", "jevo"): "lijevo",
     ("de", "sno"): "desno",
     ("hoda", "i"): "hodaj",
+    ("hodaj", "i"): "hodaj i",
+    ("hode", "i"): "hodaj",
+    ("gleda", "i"): "gledaj",
+    ("oko", "lo"): "okolo",
 }
 
 # Mapping: SCAN Serbian token -> natural Serbian with diacritics (for gTTS)
@@ -82,6 +97,7 @@ def add_diacritics(command):
     for tok in tokens:
         result.append(_SCAN_TO_NATURAL.get(tok, tok))
     return " ".join(result)
+
 
 def text_to_speech(text, filepath, language="sr"):
     """
@@ -125,11 +141,10 @@ def normalize_transcript(text):
     text = re.sub(r"[^\w\s]", "", text).lower().strip()
     text = text.replace("đ", "dj").replace("Đ", "DJ")
     text = text.translate(_DIACRITIC_MAP)
-    tokens = []
-    for t in text.split():
-        tokens.append(_SCAN_ALIASES.get(t, t))
 
-    stitched: list = []
+    # Bigram pass
+    tokens = text.split()
+    stitched = []
     i = 0
     while i < len(tokens):
         if i + 1 < len(tokens) and (tokens[i], tokens[i + 1]) in _BIGRAM_FIXES:
@@ -139,7 +154,12 @@ def normalize_transcript(text):
             stitched.append(tokens[i])
             i += 1
 
-    return " ".join(stitched)
+    # Alias pass
+    result = []
+    for t in stitched:
+        result.append(_SCAN_ALIASES.get(t, t))
+
+    return " ".join(result)
 
 
 def transcribe(filepath, whisper_model_name="small", language="sr", normalize=True):
@@ -330,7 +350,10 @@ def run_asr_pipeline(
             }
         )
 
-    n_match = sum(r["match"] for r in results)
+    n_match = 0
+    for r in results:
+        if r["match"]:
+            n_match += 1
     print(
         f"\nDone. Exact-match transcription accuracy: {n_match}/{len(results)} "
         f"({n_match / len(results):.1%})"

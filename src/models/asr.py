@@ -21,8 +21,12 @@ _SCAN_ALIASES = {
     "ljivo": "lijevo",
     "lievo": "lijevo",
     "levo": "lijevo",
+    "lovlijevo": "lijevo",
+    "ilijevo": "lijevo",
+    "ladesno": "desno",
     "desno": "desno",
     "skoci": "skoci",
+    "skocili": "skoci",
     "hodai": "hodaj",
     "hodati": "hodaj",
     "hoda": "hodaj",
@@ -65,6 +69,7 @@ _BIGRAM_FIXES: dict = {
     ("ili", "jevo"): "lijevo",
     ("i", "lijevo"): "lijevo",
     ("lo", "vijevo"): "lijevo",
+    ("li", "jevol"): "lijevo",
     ("de", "sno"): "desno",
     ("la", "desno"): "desno",
     ("hoda", "i"): "hodaj",
@@ -177,7 +182,8 @@ def normalize_transcript(text):
     for t in result:
         if t not in skip_tokens:
             cleaned.append(t)
-    return " ".join(cleaned)
+    result_str = " ".join(cleaned)
+    return " ".join(result_str.split())
 
 def transcribe(filepath, whisper_model_name="small", language="sr", normalize=True):
     """

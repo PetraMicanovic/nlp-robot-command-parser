@@ -41,6 +41,9 @@ _BIGRAM_FIXES: dict = {
     ("dva", "puta"): "dva puta",
     ("tri", "puta"): "tri puta",
     ("okreni", "se"): "okreni se",
+    ("li", "jevo"): "lijevo",
+    ("de", "sno"): "desno",
+    ("hoda", "i"): "hodaj",
 }
 
 # Mapping: SCAN Serbian token -> natural Serbian with diacritics (for gTTS)

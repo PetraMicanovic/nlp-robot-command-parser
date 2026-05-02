@@ -29,6 +29,8 @@ _SCAN_ALIASES = {
     "hodej": "hodaj",
     "hodei": "hodaj",
     "hode": "hodaj",
+    "hvoda": "hodaj",
+    "koda": "hodaj",
     "trcati": "trci",
     "trcite": "trci",
     "trcimo": "trci",
@@ -48,6 +50,9 @@ _SCAN_ALIASES = {
     "oko": "okolo",
     "suprudno": "suprotno",
     "suuprotno": "suprotno",
+    "je": "",
+    "ih": "",
+    "ik": "",
 }
 
 _BIGRAM_FIXES: dict = {
@@ -59,6 +64,7 @@ _BIGRAM_FIXES: dict = {
     ("li", "jevo"): "lijevo",
     ("ili", "jevo"): "lijevo",
     ("i", "lijevo"): "lijevo",
+    ("lo", "vijevo"): "lijevo",
     ("de", "sno"): "desno",
     ("la", "desno"): "desno",
     ("hoda", "i"): "hodaj",
@@ -166,8 +172,12 @@ def normalize_transcript(text):
     for t in stitched:
         result.append(_SCAN_ALIASES.get(t, t))
 
-    return " ".join(result)
-
+    cleaned = []
+    skip_tokens = {"je", "ih", "ik"}
+    for t in result:
+        if t not in skip_tokens:
+            cleaned.append(t)
+    return " ".join(cleaned)
 
 def transcribe(filepath, whisper_model_name="small", language="sr", normalize=True):
     """

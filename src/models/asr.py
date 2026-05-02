@@ -36,14 +36,13 @@ _SCAN_ALIASES = {
     "drci": "trci",
     "skociti": "skoci",
     "skolci": "skoci",
-    "hodati": "hodaj",
-    "trcati": "trci",
     "gledati": "gledaj",
     "gledajte": "gledaj",
     "gleda": "gledaj",
     "gledaji": "gledaj",
     "okrenite": "okreni",
     "okrenuti": "okreni",
+    "oko": "okolo",
 }
 
 _BIGRAM_FIXES: dict = {

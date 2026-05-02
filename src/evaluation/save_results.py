@@ -9,6 +9,7 @@ This module provides utility functions for:
 import os
 import json
 
+
 def save_evaluation_results(results, split_name, output_dir="results"):
     """
     Save evaluation results (from evaluate_model) into a JSON file.
@@ -79,9 +80,7 @@ def copy_results_to_drive(output_dir="results"):
 
         dest = "/content/drive/MyDrive/nlp-robot-command-parser/results"
 
-        # Remove existing destination to avoid conflicts
-        if os.path.exists(dest):
-            shutil.rmtree(dest)
+        os.makedirs(dest, exist_ok=True)
 
         # Copy entire directory
         shutil.copytree(output_dir, dest)

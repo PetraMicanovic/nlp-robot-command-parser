@@ -83,7 +83,7 @@ def copy_results_to_drive(output_dir="results"):
         os.makedirs(dest, exist_ok=True)
 
         # Copy entire directory
-        shutil.copytree(output_dir, dest)
+        shutil.copytree(output_dir, dest, dirs_exist_ok = True)
 
         print(f"Results folder copied to Google Drive: {dest}")
 

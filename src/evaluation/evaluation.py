@@ -135,3 +135,73 @@ def print_length_analysis(buckets):
         else:
             acc = 0.0
         print(f"  {str(b)+'-'+str(b+2):>8}  {acc:>10.2%}  {s['total']:>10}")
+
+
+def evaluate_on_huric(model, tokenizer, cfg, device, data):
+    """
+    Evaluates the model on HuRIC Serbian commands.
+    Uses the same predict() function as SCAN evaluation.
+
+    Parameters:
+    model: T5ForConditionalGeneration
+    tokenizer: T5Tokenizer
+    cfg: dict
+    device: str
+    data: list of dict
+        Each element has {"input": str, "output": str, "source_file": str}
+
+    Returns:
+    accuracy: float
+    """
+    from src.models.t5_model import predict
+
+    model_cfg = cfg["model"]
+    correct = 0
+    errors = []
+
+    for item in data:
+        pred = predict(
+            item["input"],
+            model,
+            tokenizer,
+            prefix=model_cfg["prefix"],
+            max_input_len=model_cfg["max_input_len"],
+            max_target_len=model_cfg["max_target_len"],
+            device=device,
+            num_beams=model_cfg["num_beams"],
+        ).strip()
+
+        if pred == item["output"].strip():
+            correct += 1
+        else:
+            errors.append(
+                {
+                    "command": item["input"],
+                    "predicted": pred,
+                    "expected": item["output"],
+                    "source": item["source_file"],
+                }
+            )
+
+    exact_match = correct / len(data)
+
+    print("HuRIC Evaluation Results")
+    print("=" * 60)
+    print(f"Exact Match: {exact_match:.2%}  ({correct}/{len(data)})")
+    print()
+
+    if errors:
+        print("Errors:")
+        print("-" * 60)
+        for e in errors:
+            print(f"Command: {e['command']}")
+            print(f"Predicted: {e['predicted']}")
+            print(f"Expected: {e['expected']}")
+            print(f"Source: {e['source']}")
+            print()
+
+    return {
+        "exact_match": round(exact_match, 4),
+        "n_evaluated": len(data),
+        "errors": errors,
+    }

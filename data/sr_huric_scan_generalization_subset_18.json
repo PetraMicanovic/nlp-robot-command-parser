@@ -1,0 +1,92 @@
+[
+  {
+    "input": "možeš li se molim te kretati naprijed",
+    "output": "I_WALK",
+    "source_file": "en/Release1/3493.hrc"
+  },
+  {
+    "input": "možeš li se molim te okrenuti desno",
+    "output": "I_TURN_RIGHT",
+    "source_file": "en/Release1/3496.hrc"
+  },
+  {
+    "input": "idi nazad",
+    "output": "I_TURN_LEFT I_TURN_LEFT I_WALK",
+    "source_file": "en/Release1/3499.hrc"
+  },
+  {
+    "input": "idi naprijed",
+    "output": "I_WALK",
+    "source_file": "en/Release1/3500.hrc"
+  },
+  {
+    "input": "molim te vrati se",
+    "output": "I_TURN_LEFT I_TURN_LEFT I_WALK",
+    "source_file": "en/Release1/3513.hrc"
+  },
+  {
+    "input": "molim te okreni se lijevo",
+    "output": "I_TURN_LEFT",
+    "source_file": "en/Release1/3525.hrc"
+  },
+  {
+    "input": "molim te okreni se lijevo i idi naprijed",
+    "output": "I_TURN_LEFT I_WALK",
+    "source_file": "en/Release1/3526.hrc"
+  },
+  {
+    "input": "molim te brzo se okreni desno",
+    "output": "I_TURN_RIGHT",
+    "source_file": "en/Release1/3529.hrc"
+  },
+  {
+    "input": "okreni se lijevo",
+    "output": "I_TURN_LEFT",
+    "source_file": "en/Release1/3560.hrc"
+  },
+  {
+    "input": "okreni se lijevo za skoro 90 stepeni",
+    "output": "I_TURN_LEFT",
+    "source_file": "en/Release1/3561.hrc"
+  },
+  {
+    "input": "okreni se desno",
+    "output": "I_TURN_RIGHT",
+    "source_file": "en/Release1/3563.hrc"
+  },
+  {
+    "input": "okreni se desno za 180 stepeni",
+    "output": "I_TURN_RIGHT I_TURN_RIGHT",
+    "source_file": "en/Release1/3564.hrc"
+  },
+  {
+    "input": "skreni lijevo",
+    "output": "I_TURN_LEFT",
+    "source_file": "en/Release1/3565.hrc"
+  },
+  {
+    "input": "pogledaj me",
+    "output": "I_LOOK",
+    "source_file": "en/Simpleset/2653.hrc"
+  },
+  {
+    "input": "prati me polako",
+    "output": "I_WALK",
+    "source_file": "en/S4R/2704.hrc"
+  },
+  {
+    "input": "prati me pažljivo",
+    "output": "I_WALK",
+    "source_file": "en/Robocup/2189.hrc"
+  },
+  {
+    "input": "molim te prati me",
+    "output": "I_WALK",
+    "source_file": "en/Robocup/2283.hrc"
+  },
+  {
+    "input": "dođi sa mnom",
+    "output": "I_WALK",
+    "source_file": "en/Robocup/2301.hrc"
+  }
+]

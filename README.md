@@ -39,7 +39,7 @@ pip install -r requirements.txt
 .
 ├── data/
 │   ├── scan/
-│   └── custom_validation_sr.json
+│   └── sr_huric_scan_generalization_subset_18.json
 │
 ├── notebooks/
 │   └── main.ipynb
@@ -72,10 +72,10 @@ pip install -r requirements.txt
 ```
 ---
 ## Notes
-- The system uses constrained decoding to ensure valid action sequences
+- The system operates in **Serbian** — SCAN commands are translated rule-by-rule from English and Whisper is configured with `language="sr"`
 - SCAN translations are implemented via simple rule-based mappings (no multilingual models)
+- Whisper output is normalized before being passed to T5 (diacritics stripped, some phonetic aliases fixed) because T5 was trained on ASCII-only tokens
 - HuRIC dataset is not used for training, only for evaluation
-- Audio inputs are processed through Whisper before being passed to the seq2seq model
 
 ---
 ## License

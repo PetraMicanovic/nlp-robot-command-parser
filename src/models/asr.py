@@ -8,6 +8,7 @@ This module provides:
 
 import whisper
 from gtts import gTTS
+from jiwer import wer
 import os
 import re
 
@@ -189,6 +190,7 @@ def normalize_transcript(text):
     result_str = " ".join(cleaned)
     return " ".join(result_str.split())
 
+
 def transcribe(filepath, whisper_model_name="small", language="sr", normalize=True):
     """
     Transcribes an audio file to text using Whisper.
@@ -345,6 +347,7 @@ def run_asr_pipeline(
         - "audio_path" -- path to the generated .mp3 file
         - "transcript" -- Whisper transcription (lowercase)
         - "match"      -- True if transcript == command (exact, lowercased)
+        - "wer" -- Word Error Rate
     """
     print(f"\n{'='*55}")
     print(f"ASR Pipeline -- {len(commands)} commands")
@@ -367,13 +370,17 @@ def run_asr_pipeline(
 
     # 3. Assemble results
     results = []
+    total_wer = 0.0
     for cmd, path, tr in zip(commands, audio_paths, transcripts):
+        wer_value = wer(cmd.lower().strip(), tr.lower().strip())
+        total_wer += wer_value
         results.append(
             {
                 "command": cmd,
                 "audio_path": path,
                 "transcript": tr,
                 "match": tr == cmd.lower().strip(),
+                "wer": round(wer_value, 4),
             }
         )
 
@@ -381,9 +388,14 @@ def run_asr_pipeline(
     for r in results:
         if r["match"]:
             n_match += 1
+    if len(results) == 0:
+        average_wer = 0.0
+    else:
+        average_wer = total_wer / len(results)
+
     print(
         f"\nDone. Exact-match transcription accuracy: {n_match}/{len(results)} "
-        f"({n_match / len(results):.1%})"
+        f"\nAverage WER: {average_wer:.4f} ({average_wer:.1%})"
     )
 
     return results

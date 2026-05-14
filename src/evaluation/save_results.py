@@ -10,6 +10,35 @@ import os
 import json
 
 
+def get_results_dir(config, model_key="model"):
+    """
+    Returns the results directory for a given model key from config.
+
+    Uses cfg["results"] mapping:
+        "model" -> cfg["results"]["t5_small_dir"]
+        "model_t5_base"-> cfg["results"]["t5_base_dir"]
+        "model_mbart" -> cfg["results"]["mbart_dir"]
+    Falls back to "results/" if the mapping is not found.
+
+    Parameters:
+    cfg: dict
+        Full config loaded from config.json
+    model_key: str
+        Key into cfg that identifies the model section
+
+    Returns:
+    output_dir: str
+    """
+    mapping = {
+        "model": config.get("results", {}).get("t5_small_dir", "results/t5-small"),
+        "model_t5_base": config.get("results", {}).get(
+            "t5_base_dir", "results/t5-base"
+        ),
+        "model_mbart": config.get("results", {}).get("mbart_dir", "results/mbart"),
+    }
+    return mapping.get(model_key, "results")
+
+
 def save_evaluation_results(results, split_name, output_dir="results"):
     """
     Save evaluation results (from evaluate_model) into a JSON file.
@@ -83,7 +112,7 @@ def copy_results_to_drive(output_dir="results"):
         os.makedirs(dest, exist_ok=True)
 
         # Copy entire directory
-        shutil.copytree(output_dir, dest, dirs_exist_ok = True)
+        shutil.copytree(output_dir, dest, dirs_exist_ok=True)
 
         print(f"Results folder copied to Google Drive: {dest}")
 

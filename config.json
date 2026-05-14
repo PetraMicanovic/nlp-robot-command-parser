@@ -6,6 +6,20 @@
     "max_target_len": 128,
     "num_beams": 4
   },
+  "model_t5_base": {
+    "name": "t5-base",
+    "prefix": "translate command to actions: ",
+    "max_input_len": 64,
+    "max_target_len": 128,
+    "num_beams": 4
+  },
+  "model_mbart": {
+    "name": "facebook/mbart-large-50",
+    "prefix": "translate command to actions: ",
+    "max_input_len": 64,
+    "max_target_len": 128,
+    "num_beams": 4
+  },
   "training": {
     "seed": 42,
     "num_epochs": 20,
@@ -14,8 +28,35 @@
     "learning_rate": 1e-4,
     "weight_decay": 0.01,
     "warmup_ratio": 0.05,
-    "output_dir": "checkpoints",
+    "output_dir": "checkpoints/t5_small",
     "early_stopping_patience": 3
+  },
+  "training_t5_base": {
+    "seed": 42,
+    "num_epochs": 20,
+    "train_batch_size": 16,
+    "eval_batch_size": 32,
+    "learning_rate": 5e-5,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    "output_dir": "checkpoints/t5-base",
+    "early_stopping_patience": 3
+  },
+  "training_mbart": {
+    "seed": 42,
+    "num_epochs": 10,
+    "train_batch_size": 8,
+    "eval_batch_size": 16,
+    "learning_rate": 3e-5,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    "output_dir": "checkpoints/mbart",
+    "early_stopping_patience": 3
+  },
+  "results": {
+    "t5_small_dir": "results/t5-small",
+    "t5_base_dir": "results/t5-base",
+    "mbart_dir": "results/mbart"
   },
   "asr": {
     "whisper_model": "small",

@@ -1,14 +1,34 @@
 """
-Module for preprocessing SCAN dataset for T5 seq2seq training.
+Module for preprocessing SCAN dataset for seq2seq training.
 
 This module provides:
     - converting raw list-of-dicts to HuggingFace Dataset
-    - tokenizing commands and actions with T5Tokenizer
+    - tokenizing commands and actions with T5Tokenizer or MBart50TokenizerFast
     - returning tokenized train/test splits ready for Trainer
 """
 
-from transformers import T5Tokenizer
+from transformers import T5Tokenizer, MBart50TokenizerFast
 from datasets import Dataset
+
+# mBART source language for Serbian input
+_MBART_SRC_LANG = "sr_Cyrl"
+
+
+def _is_mbart(model_name):
+    """
+    Checks whether the selected model is an mBART model.
+
+    Parameters:
+    model_name: str
+        Name or path of the model.
+
+    Returns:
+    bool
+        True if the model name contains 'mbart',
+        otherwise False.
+    """
+    return "mbart" in model_name.lower()
+
 
 def to_hf_dataset(data):
     """
@@ -29,25 +49,32 @@ def to_hf_dataset(data):
 
     return Dataset.from_dict({"commands": commands, "actions": actions})
 
+
 def get_tokenizer(model_name):
     """
-    Loads a T5 tokenizer.
+    Loads the appropriate tokenizer based on the model.
 
     Parameters:
     model_name: str
-        HuggingFace model name 
+        HuggingFace model name
 
     Returns:
-    tokenizer: T5Tokenizer 
+    tokenizer: T5Tokenizer or MBart50TokenizerFast
     """
+    if _is_mbart(model_name):
+        tokenizer = MBart50TokenizerFast.from_pretrained(model_name)
+        tokenizer.src_lang = _MBART_SRC_LANG
+        return tokenizer
+
     return T5Tokenizer.from_pretrained(model_name)
+
 
 def preprocess(examples, tokenizer, prefix, max_input_len, max_target_len):
     """
     Preprocesses a batch of examples for T5 training.
 
     Adds a task prefix to each command, tokenizes inputs (commands) and targets (actions), and replaces padding token IDs in labels with -100 (ignored in loss).
-    
+
     Parameters:
     examples: dict
         Batch from HuggingFace Dataset with keys "commands" and "actions"
@@ -102,7 +129,9 @@ def preprocess(examples, tokenizer, prefix, max_input_len, max_target_len):
     return model_inputs
 
 
-def tokenize_dataset(dataset: Dataset, tokenizer, prefix, max_input_len, max_target_len):
+def tokenize_dataset(
+    dataset: Dataset, tokenizer, prefix, max_input_len, max_target_len
+):
     """
     Applies preprocessing to the entire dataset using HuggingFace map().
 
@@ -123,19 +152,14 @@ def tokenize_dataset(dataset: Dataset, tokenizer, prefix, max_input_len, max_tar
     tokenized: datasets.Dataset
         Dataset ready for training (input_ids, attention_mask, labels)
     """
+
     def preprocess_wrapper(examples):
-        return preprocess(
-            examples,
-            tokenizer,
-            prefix,
-            max_input_len,
-            max_target_len
-        )
+        return preprocess(examples, tokenizer, prefix, max_input_len, max_target_len)
 
     tokenized = dataset.map(
         preprocess_wrapper,
         batched=True,
-        remove_columns=["commands", "actions"], # remove raw text after tokenization
+        remove_columns=["commands", "actions"],  # remove raw text after tokenization
     )
 
     return tokenized

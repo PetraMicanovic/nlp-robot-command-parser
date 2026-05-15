@@ -118,30 +118,40 @@ def build_compute_metrics(tokenizer):
     return compute_metrics
 
 
-def build_trainer(model, tokenizer, tokenized_dataset, training_cfg, device_fp16):
+def build_trainer(model, tokenizer, tokenized_dataset, cfg, model_key="model", device_fp16=False):
     """
     Builds and returns a configured Seq2SeqTrainer.
 
+    The checkpoint output directory is resolved automatically from config using get_checkpoint_dir(cfg, model_key), so the caller does not need to construct or pass a path manually.
+
     Parameters:
-    model: T5ForConditionalGeneration
-    tokenizer: T5Tokenizer
+    model: T5ForConditionalGeneration or MBartForConditionalGeneration
+    tokenizer: T5Tokenizer or MBart50TokenizerFast
     tokenized_dataset: DatasetDict
         Must have "train" and "test" splits
-    training_cfg: dict
-        Training hyperparameters from config.json["training"]
+    cfg: dict
+        Full config loaded from config.json
+    model_key: str
+        Key into cfg that identifies the model section
+        ("model", "model_t5_base", or "model_mbart")
     device_fp16: bool
         Whether to use mixed precision (True on GPU)
 
     Returns:
     trainer: Seq2SeqTrainer
     """
-    total_steps = (
-        len(tokenized_dataset["train"]) // training_cfg["train_batch_size"]
-    ) * training_cfg["num_epochs"]
+    training_key_map = {
+        "model": "training",
+        "model_t5_base": "training_t5_base",
+        "model_mbart": "training_mbart",
+    }
+    training_cfg = cfg[training_key_map[model_key]]
+    output_dir = get_checkpoint_dir(cfg, model_key)
+    total_steps = ( len(tokenized_dataset["train"]) // training_cfg["train_batch_size"]) * training_cfg["num_epochs"]
     warmup_steps = int(total_steps * training_cfg["warmup_ratio"])
 
     args = Seq2SeqTrainingArguments(
-        output_dir=training_cfg["output_dir"],
+        output_dir=output_dir,
         num_train_epochs=training_cfg["num_epochs"],
         per_device_train_batch_size=training_cfg["train_batch_size"],
         per_device_eval_batch_size=training_cfg["eval_batch_size"],

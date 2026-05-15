@@ -39,9 +39,9 @@ def get_results_dir(config, model_key="model"):
     return mapping.get(model_key, "results")
 
 
-def save_evaluation_results(results, split_name, output_dir="results"):
+def save_evaluation_results(results, split_name, cfg, model_key="model"):
     """
-    Save evaluation results (from evaluate_model) into a JSON file.
+    Save evaluation results (from evaluate_model) into a JSON file. The output directory is resolved automatically from config using get_results_dir(cfg, model_key), so the caller does not need to construct or pass a path manually.
     The file will be named as: evaluation_<split_name>.json
 
     Parameters:
@@ -49,10 +49,13 @@ def save_evaluation_results(results, split_name, output_dir="results"):
         Dictionary containing evaluation metrics
     split_name: str
         Dataset split name
-    output_dir: str
-        Directory where the JSON file will be stored
+    cfg: dict
+        Full config loaded from config.json
+    model_key: str
+        Key into cfg that identifies the model section
+        ("model", "model_t5_base", or "model_mbart")
     """
-
+    output_dir = get_results_dir(cfg, model_key)
     os.makedirs(output_dir, exist_ok=True)
     filepath = os.path.join(output_dir, f"evaluation_{split_name}.json")
 

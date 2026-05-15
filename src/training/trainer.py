@@ -118,7 +118,9 @@ def build_compute_metrics(tokenizer):
     return compute_metrics
 
 
-def build_trainer(model, tokenizer, tokenized_dataset, cfg, model_key="model", device_fp16=False):
+def build_trainer(
+    model, tokenizer, tokenized_dataset, cfg, model_key="model", device_fp16=False
+):
     """
     Builds and returns a configured Seq2SeqTrainer.
 
@@ -147,7 +149,9 @@ def build_trainer(model, tokenizer, tokenized_dataset, cfg, model_key="model", d
     }
     training_cfg = cfg[training_key_map[model_key]]
     output_dir = get_checkpoint_dir(cfg, model_key)
-    total_steps = ( len(tokenized_dataset["train"]) // training_cfg["train_batch_size"]) * training_cfg["num_epochs"]
+    total_steps = (
+        len(tokenized_dataset["train"]) // training_cfg["train_batch_size"]
+    ) * training_cfg["num_epochs"]
     warmup_steps = int(total_steps * training_cfg["warmup_ratio"])
 
     args = Seq2SeqTrainingArguments(

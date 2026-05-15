@@ -2,6 +2,7 @@
 Module for training the T5 seq2seq model.
 
 This module provides:
+    - resolving checkpoint directories from config
     - building training arguments from config
     - defining evaluation metrics (exact match, token accuracy)
     - constructing and returning a Seq2SeqTrainer
@@ -16,13 +17,42 @@ from transformers import (
 )
 
 
+def get_checkpoint_dir(cfg, model_key="model"):
+    """
+    Returns the final checkpoint directory for a given model key from config.
+    Reads output_dir from the matching training section and appends "/final":
+        "model" -> cfg["training"]["output_dir"] + "/final"
+        "model_t5_base" -> cfg["training_t5_base"]["output_dir"] + "/final"
+        "model_mbart" -> cfg["training_mbart"]["output_dir"] + "/final"
+    Falls back to "checkpoints/final" if the key is not found.
+
+    Parameters:
+    cfg: dict
+        Full config loaded from config.json
+    model_key: str
+        Key into cfg that identifies the model section
+
+    Returns:
+    checkpoint_dir: str
+    """
+    training_key_map = {
+        "model": "training",
+        "model_t5_base": "training_t5_base",
+        "model_mbart": "training_mbart",
+    }
+    training_key = training_key_map.get(model_key)
+    if training_key and training_key in cfg:
+        return cfg[training_key]["output_dir"] + "/final"
+    return "checkpoints/final"
+
+
 def build_compute_metrics(tokenizer):
     """
     Returns a compute_metrics function for Seq2SeqTrainer.
 
     Computes:
-        - exact_match    : fraction of sequences predicted exactly correct
-        - token_accuracy : fraction of individual tokens predicted correctly
+        - exact_match: fraction of sequences predicted exactly correct
+        - token_accuracy: fraction of individual tokens predicted correctly
 
     Parameters:
     tokenizer: T5Tokenizer

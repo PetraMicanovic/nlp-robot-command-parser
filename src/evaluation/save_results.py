@@ -65,7 +65,7 @@ def save_evaluation_results(results, split_name, cfg, model_key="model"):
     print(f"Evaluation results saved to: {filepath}")
 
 
-def save_length_analysis(buckets, output_dir="results"):
+def save_length_analysis(buckets, cfg, model_key="model"):
     """
     Save length analysis results into a JSON file.
 
@@ -73,9 +73,13 @@ def save_length_analysis(buckets, output_dir="results"):
     buckets: dict
         Dictionary containing grouped analysis results.
         Keys usually represent categories, ranges or sequence lengths, while values contain statistics or collected data for each group.
-    output_dir: str
-        Directory where the JSON file will be stored
+    cfg: dict
+        Full config loaded from config.json
+    model_key: str
+        Key into cfg that identifies the model section
+        ("model", "model_t5_base", or "model_mbart")
     """
+    output_dir = get_results_dir(cfg, model_key)
 
     os.makedirs(output_dir, exist_ok=True)
     filepath = os.path.join(output_dir, f"length_analysis.json")
@@ -90,7 +94,7 @@ def save_length_analysis(buckets, output_dir="results"):
     print(f"Length analysis saved to: {filepath}")
 
 
-def copy_results_to_drive(output_dir="results"):
+def copy_results_to_drive(cfg, model_key="model"):
     """
     Copy the local results directory to Google Drive.
 
@@ -98,8 +102,11 @@ def copy_results_to_drive(output_dir="results"):
     It mounts Google Drive and copies the entire results folder.
 
     Parameters:
-    output_dir: str
-        Local directory containing results
+    cfg: dict
+        Full config loaded from config.json
+    model_key: str
+        Key into cfg that identifies the model section
+        ("model", "model_t5_base", or "model_mbart")
     """
 
     try:
@@ -110,8 +117,9 @@ def copy_results_to_drive(output_dir="results"):
 
         import shutil
 
-        dest = "/content/drive/MyDrive/nlp-robot-command-parser/results"
+        output_dir = get_results_dir(cfg, model_key)
 
+        dest = f"/content/drive/MyDrive/nlp-robot-command-parser/{output_dir}"
         os.makedirs(dest, exist_ok=True)
 
         # Copy entire directory
@@ -125,18 +133,23 @@ def copy_results_to_drive(output_dir="results"):
         )
 
 
-def save_asr_results(asr_results, output_dir="results", filename="asr_results.json"):
+def save_asr_results(asr_results, cfg, model_key="model", filename="asr_results.json"):
     """
     Save ASR pipeline results to a JSON file.
 
     Parameters
     asr_results : list[dict]
         Output of ``run_asr_pipeline`` — each dict has keys: ``command``, ``audio_path``, ``transcript``, ``match``
-    output_dir : str
-        Directory where the file will be stored
+    cfg: dict
+        Full config loaded from config.json
+    model_key: str
+        Key into cfg that identifies the model section
+        ("model", "model_t5_base", or "model_mbart")
     filename : str
         Output filename
     """
+    output_dir = get_results_dir(cfg, model_key)
+
     os.makedirs(output_dir, exist_ok=True)
     filepath = os.path.join(output_dir, filename)
 

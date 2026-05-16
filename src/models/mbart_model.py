@@ -34,10 +34,7 @@ def load_mbart_model(model_name, device):
     tokenizer = MBart50TokenizerFast.from_pretrained(model_name)
     tokenizer.src_lang = MBART_SRC_LANG
 
-    if device == "cuda":
-        model = MBartForConditionalGeneration.from_pretrained(model_name,torch_dtype=torch.float16)
-    else:
-        model = MBartForConditionalGeneration.from_pretrained(model_name,torch_dtype=torch.float32)
+    model = MBartForConditionalGeneration.from_pretrained(model_name)
     model = model.to(device)
 
     n_params = 0

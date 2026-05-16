@@ -37,6 +37,9 @@ def load_mbart_model(model_name, device):
     model = MBartForConditionalGeneration.from_pretrained(model_name)
     model = model.to(device)
 
+    for param in model.model.encoder.parameters():
+        param.requires_grad = False
+
     n_params = 0
     for p in model.parameters():
         if p.requires_grad:

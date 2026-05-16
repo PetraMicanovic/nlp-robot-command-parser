@@ -43,15 +43,19 @@
     "early_stopping_patience": 3
   },
   "training_mbart": {
-    "seed": 42,
-    "num_epochs": 10,
-    "train_batch_size": 8,
-    "eval_batch_size": 16,
-    "learning_rate": 3e-5,
-    "weight_decay": 0.01,
-    "warmup_ratio": 0.05,
-    "output_dir": "checkpoints/mbart",
-    "early_stopping_patience": 3
+      "seed": 42,
+      "num_epochs": 10,
+      "train_batch_size": 2,
+      "eval_batch_size": 4,
+      "learning_rate": 3e-5,
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.05,
+      "output_dir": "checkpoints/mbart",
+      "early_stopping_patience": 3,
+      "gradient_accumulation_steps": 8,
+      "gradient_checkpointing": true,
+      "optim": "adamw_bnb_8bit",
+      "dataloader_pin_memory": false
   },
   "results": {
     "t5_small_dir": "results/t5-small",

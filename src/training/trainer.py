@@ -174,6 +174,10 @@ def build_trainer(
         fp16=device_fp16,
         seed=training_cfg["seed"],
         report_to="none",
+        gradient_accumulation_steps=training_cfg.get("gradient_accumulation_steps", 1),
+        gradient_checkpointing=training_cfg.get("gradient_checkpointing", False),
+        optim=training_cfg.get("optim", "adamw_torch"),
+        dataloader_pin_memory=training_cfg.get("dataloader_pin_memory", True),
     )
 
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, pad_to_multiple_of=8)

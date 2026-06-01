@@ -79,10 +79,10 @@ def save_length_analysis(buckets, cfg, model_key="model"):
         Key into cfg that identifies the model section
         ("model", "model_t5_base", or "model_mbart")
     """
-    output_dir = get_results_dir(cfg, model_key)
+    output_dir = os.path.join(get_results_dir(cfg, model_key), "length_analysis")
 
     os.makedirs(output_dir, exist_ok=True)
-    filepath = os.path.join(output_dir, f"length_analysis.json")
+    filepath = os.path.join(output_dir, "length_analysis.json")
 
     serializable = {}
     for key in buckets:

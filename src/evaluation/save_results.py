@@ -86,7 +86,14 @@ def save_length_analysis(buckets, cfg, model_key="model"):
 
     serializable = {}
     for key in buckets:
-        serializable[str(key)] = buckets[key]
+        b = buckets[key]
+        total = b.get("total", 0)
+        correct = b.get("correct", 0)
+        if total > 0:
+            serializable[str(key)] = {**b, "exact_match": round(correct / total, 4)}
+        else:
+            serializable[str(key)] = {**b, "exact_match": 0.0}
+
 
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(serializable, f, indent=2, ensure_ascii=False)

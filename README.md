@@ -1,11 +1,11 @@
 # NLP Robot Command Parser
 
-This repository contains an end-to-end system for converting spoken or textual commands into structured action sequences for robot control. 
+This repository contains an end-to-end system for converting spoken or textual commands into structured action sequences for robot control.
 The project combines:
 - **Automatic Speech Recognition (ASR)** using Whisper
-- **Semantic parsing** using a Transformer-based seq2seq model T5
+- **Semantic parsing** using a Transformer-based seq2seq models: T5-small, T5-base and mBART-large-50.
 
-The system maps natural language commands into executable action sequences, with a focus on compositional generalization and robustness to different input forms. 
+The system maps natural language commands into executable action sequences, with a focus on compositional generalization and robustness to different input forms.
 
 ---
 ## Environment Notes
@@ -20,20 +20,42 @@ The system maps natural language commands into executable action sequences, with
 
 ## Datasets
 
-- **SCAN** [Simplified versions of the CommAI Navigation tasks](https://github.com/brendenlake/SCAN)
+- **SCAN** - [Simplified versions of the CommAI Navigation tasks](https://github.com/brendenlake/SCAN)
 
-Synthetic dataset of command-actions pairs used for training and primary evaluation. Additionally translated into Serbian using rule-based mapping of commands.
-- **HuRIC** [Human Robot Interaction Corpus](https://github.com/crux82/huric)
+Synthetic dataset of command-actions pairs used for training and primary evaluation. Commands are additionally translated into Serbian using rule-based word-by-word mapping.
 
-Real-world human-robot interaction dataset used for additional evaluation and generalization testing. For this project, a subset(~25-50 samples) is manually selected, analyzed and adapted.
+- **HuRIC** - [Human Robot Interaction Corpus](https://github.com/crux82/huric)
+
+Real-world human-robot interaction dataset used for additional evaluation and generalization testing. For this project, a subset(~18 samples) is manually selected, analyzed and adapted.
 
 ---
+
 ## Requirements
-Install dependencies using:
+
+### Local
 ```bash
 pip install -r requirements.txt
 ```
+
+### Google Colab
+
+The first few cells in each notebook handle the setup automatically:
+
+```python
+!git clone https://github.com/PetraMicanovic/nlp-robot-command-parser.git
+%cd nlp-robot-command-parser
+```
+```python
+!git clone https://github.com/brendenlake/SCAN.git data/scan
+```
+```python
+!pip install -q -r requirements.txt
+```
+
+Just run these cells in order at the start of each notebook before anything else.
+
 ---
+
 ## Structure 
 ```bash
 .
@@ -42,7 +64,10 @@ pip install -r requirements.txt
 │   └── sr_huric_scan_generalization_subset_18.json
 │
 ├── notebooks/
-│   └── main.ipynb
+│   ├── t5_small.ipynb
+│   ├── t5_base.ipynb
+│   ├── mbart.ipynb
+│   └── comparision.ipynb
 │
 ├── src/
 │   ├── data/
@@ -52,6 +77,7 @@ pip install -r requirements.txt
 │   │
 │   ├── models/
 │   │   ├── t5_model.py
+│   │   ├── mbart_model.py
 │   │   └── asr.py
 │   │
 │   ├── training/
@@ -62,6 +88,7 @@ pip install -r requirements.txt
 │   │   └── save_results.py
 │   │
 │   └── pipeline.py
+│
 ├── results/
 │
 ├── .gitignore
@@ -72,6 +99,7 @@ pip install -r requirements.txt
 ```
 ---
 ## Notes
+- `t5_small.ipynb`, `t5_base.ipynb` and `mbart.ipynb` must all be run before `comparision.ipynb`, as it depends on their saved results.
 - The system operates in **Serbian** — SCAN commands are translated rule-by-rule from English and Whisper is configured with `language="sr"`
 - SCAN translations are implemented via simple rule-based mappings (no multilingual models)
 - Whisper output is normalized before being passed to T5 (diacritics stripped, some phonetic aliases fixed) because T5 was trained on ASCII-only tokens

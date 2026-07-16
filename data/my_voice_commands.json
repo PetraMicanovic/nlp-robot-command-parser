@@ -1,0 +1,37 @@
+[
+    {
+        "input": "gledaj desno nakon sto skocis",
+        "output": "I_JUMP I_TURN_RIGHT I_LOOK",
+        "audio_file": "cmd_1.mp3"
+    },
+    {
+        "input": "hodaj lijevo",
+        "output": "I_TURN_LEFT I_WALK",
+        "audio_file": "cmd_2.mp3"
+    },
+    {
+        "input": "hodaj lijevo okolo",
+        "output": "I_TURN_LEFT I_WALK I_TURN_LEFT I_WALK I_TURN_LEFT I_WALK I_TURN_LEFT I_WALK",
+        "audio_file": "cmd_3.mp3"
+    },
+    {
+        "input": "hodaj suprotno od desno",
+        "output": "I_TURN_RIGHT I_TURN_RIGHT I_WALK",
+        "audio_file": "cmd_4.mp3"
+    },
+    {
+        "input": "okreni se desno tri puta i gledaj",
+        "output": "I_TURN_RIGHT I_TURN_RIGHT I_TURN_RIGHT I_LOOK",
+        "audio_file": "cmd_5.mp3"
+    },
+    {
+        "input": "skoci tri puta",
+        "output": "I_JUMP I_JUMP I_JUMP",
+        "audio_file": "cmd_6.mp3"
+    },
+    {
+        "input": "trci dva puta i skoci",
+        "output": "I_RUN I_RUN I_JUMP",
+        "audio_file": "cmd_7.mp3"
+    }
+]

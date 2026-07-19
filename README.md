@@ -28,6 +28,13 @@ Synthetic dataset of command-actions pairs used for training and primary evaluat
 
 Real-world human-robot interaction dataset used for additional evaluation and generalization testing. For this project, a subset(~18 samples) is manually selected, analyzed and adapted.
 
+- **Live voice demo (own recordings)**
+
+A small, manually recorded set of 7 commands, spoken and recorded by hand rather than synthesized, used to sanity-check the full pipeline (Audio → Whisper → model) against real human speech instead of gTTS audio.
+  - Recordings: `data/audio/my_voice_demo/*.mp3`
+  - Expected commands + actions: `data/my_voice_commands.json` (same format as the HuRIC json — English action tokens, translated to Serbian at evaluation time for t5-small/t5-base/mBART, since all three were trained with `cfg['data']['lang'] == 'sr'`)
+  - Run from the "Live voice demo" section added to each of the three model notebooks. Results are saved to `results/<model>/evaluation_voice_demo.json` and visualized in `comparision.ipynb`.
+
 ---
 
 ## Requirements
@@ -61,6 +68,9 @@ Just run these cells in order at the start of each notebook before anything else
 .
 ├── data/
 │   ├── scan/
+│   ├── audio/
+│   │   └── my_voice_demo/
+│   ├── my_voice_commands.json
 │   └── sr_huric_scan_generalization_subset_18.json
 │
 ├── notebooks/
@@ -104,6 +114,8 @@ Just run these cells in order at the start of each notebook before anything else
 - SCAN translations are implemented via simple rule-based mappings (no multilingual models)
 - Whisper output is normalized before being passed to T5 (diacritics stripped, some phonetic aliases fixed) because T5 was trained on ASCII-only tokens
 - HuRIC dataset is not used for training, only for evaluation
+- mBART-50 has no dedicated language code for Serbian. Croatian (hr_HR) is used as the source-language tag for tokenization instead, since Serbian and Croatian are mutually intelligible standard languages and Croatian is the closest code available among mBART-50's 50 supported languages. T5-small and T5-base are unaffected, as their tokenizers have no concept of a source-language tag.
+- Each of `t5_small.ipynb`, `t5_base.ipynb` and `mbart.ipynb` includes a "Live voice demo" section that evaluates the trained model on the 7 hand-recorded commands, both with and without transcript normalization, mirroring the main 100-sample pipeline evaluation.
 
 ---
 ## License

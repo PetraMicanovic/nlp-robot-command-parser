@@ -10,8 +10,8 @@ This module provides:
 from transformers import T5Tokenizer, MBart50TokenizerFast
 from datasets import Dataset
 
-# mBART source language for Serbian input
-_MBART_SRC_LANG = "sr_Cyrl"
+# mBART source language
+_MBART_SRC_LANG = "hr_HR"
 
 
 def _is_mbart(model_name):
